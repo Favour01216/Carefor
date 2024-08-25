@@ -1,8 +1,6 @@
 "use server";
 
-import { ID, Query } from "node-appwrite";
-import { InputFile } from "node-appwrite/file";
-import { parseStringify } from "../utils";
+import { ID, InputFile, Query } from "node-appwrite";
 
 import {
   BUCKET_ID,
@@ -14,7 +12,7 @@ import {
   storage,
   users,
 } from "../appwrite.config";
-
+import { parseStringify } from "../utils";
 
 // CREATE APPWRITE USER
 export const createUser = async (user: CreateUserParams) => {
@@ -67,14 +65,13 @@ export const registerPatient = async ({
     if (identificationDocument) {
       const inputFile =
         identificationDocument &&
-        InputFile.fromBuffer(
+        InputFile.fromBlob(
           identificationDocument?.get("blobFile") as Blob,
           identificationDocument?.get("fileName") as string
         );
 
       file = await storage.createFile(BUCKET_ID!, ID.unique(), inputFile);
     }
-    
 
     // Create new patient document -> https://appwrite.io/docs/references/cloud/server-nodejs/databases#createDocument
     const newPatient = await databases.createDocument(
@@ -95,15 +92,6 @@ export const registerPatient = async ({
     console.error("An error occurred while creating a new patient:", error);
   }
 };
-
-async function getPatientDetails(userId: string) {
-  const response = await fetch(`/api/patient/${userId}`);
-  if (!response.ok) {
-    throw new Error('Failed to fetch patient details');
-  }
-  const data = await response.text();
-  return parseStringify(data);
-}
 
 // GET PATIENT
 export const getPatient = async (userId: string) => {
