@@ -17,8 +17,27 @@ import { parseStringify } from "../utils";
 // CREATE APPWRITE USER
 export const createUser = async (user: CreateUserParams) => {
   try {
-    // Create new user -> https://appwrite.io/docs/references/1.5.x/server-nodejs/users#create
-    const newuser = await users.create(
+    if (!DATABASE_ID || !PATIENT_COLLECTION_ID) {
+      throw new Error("Database configuration is missing");
+    }
+
+    // Check for existing users by both email and phone in parallel
+    const [emailResults, phoneResults] = await Promise.all([
+      users.list([Query.equal("email", [user.email]), Query.limit(1)]),
+      users.list([Query.equal("phone", [user.phone]), Query.limit(1)]),
+    ]);
+
+    // Return existing user if found
+    if (emailResults.total > 0) {
+      return emailResults.users[0];
+    }
+
+    if (phoneResults.total > 0) {
+      return phoneResults.users[0];
+    }
+
+    // Create new user if doesn't exist
+    const newUser = await users.create(
       ID.unique(),
       user.email,
       user.phone,
@@ -26,17 +45,36 @@ export const createUser = async (user: CreateUserParams) => {
       user.name
     );
 
-    return parseStringify(newuser);
+    // Create patient document
+    await databases.createDocument(
+      DATABASE_ID,
+      PATIENT_COLLECTION_ID,
+      ID.unique(),
+      {
+        userId: newUser.$id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        isVerified: false,
+      }
+    );
+
+    return parseStringify(newUser);
   } catch (error: any) {
-    // Check existing user
-    if (error && error?.code === 409) {
+    if (error?.code === 409) {
+      // Handle race condition where user was created between our check and create
       const existingUser = await users.list([
         Query.equal("email", [user.email]),
+        Query.limit(1),
       ]);
 
-      return existingUser.users[0];
+      if (existingUser.total > 0) {
+        return existingUser.users[0];
+      }
     }
-    console.error("An error occurred while creating a new user:", error);
+
+    console.error("Error creating user:", error);
+    throw new Error(error?.message || "Failed to create user");
   }
 };
 

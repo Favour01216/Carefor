@@ -1,10 +1,12 @@
-/* eslint-disable no-unused-vars */
+"use client";
+
 import { E164Number } from "libphonenumber-js/core";
 import Image from "next/image";
 import ReactDatePicker from "react-datepicker";
 import { Control } from "react-hook-form";
 import PhoneInput from "react-phone-number-input";
 
+import { cn } from "@/lib/utils";
 import { Checkbox } from "./ui/checkbox";
 import {
   FormControl,
@@ -40,29 +42,32 @@ interface CustomProps {
   children?: React.ReactNode;
   renderSkeleton?: (field: any) => React.ReactNode;
   fieldType: FormFieldType;
+  autoComplete?: string;
 }
 
 const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
   switch (props.fieldType) {
     case FormFieldType.INPUT:
       return (
-        <div className="flex rounded-md border border-dark-500 bg-dark-400">
+        <div className={cn("flex rounded-md border border-dark-500 bg-dark-400", props.disabled && "opacity-50")}>
           {props.iconSrc && (
-            <Image
-              src={props.iconSrc}
-              height={24}
-              width={24}
-              alt={props.iconAlt || "icon"}
-              className="ml-2"
-            />
+            <div className="flex items-center justify-center px-3">
+              <Image
+                src={props.iconSrc}
+                alt={props.iconAlt || "icon"}
+                width={16}
+                height={16}
+                className="h-4 w-4"
+              />
+            </div>
           )}
-          <FormControl>
-            <Input
-              placeholder={props.placeholder}
-              {...field}
-              className="shad-input border-0"
-            />
-          </FormControl>
+          <Input
+            {...field}
+            placeholder={props.placeholder}
+            disabled={props.disabled}
+            autoComplete={props.autoComplete}
+            className="border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
+          />
         </div>
       );
     case FormFieldType.TEXTAREA:
@@ -131,11 +136,9 @@ const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
       return (
         <FormControl>
           <Select onValueChange={field.onChange} defaultValue={field.value}>
-            <FormControl>
-              <SelectTrigger className="shad-select-trigger">
-                <SelectValue placeholder={props.placeholder} />
-              </SelectTrigger>
-            </FormControl>
+            <SelectTrigger className="shad-select-trigger">
+              <SelectValue placeholder={props.placeholder} />
+            </SelectTrigger>
             <SelectContent className="shad-select-content">
               {props.children}
             </SelectContent>

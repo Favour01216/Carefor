@@ -1,11 +1,38 @@
 import { withSentryConfig } from "@sentry/nextjs";
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  images: {
+    formats: ["image/avif", "image/webp"],
+    minimumCacheTTL: 60,
+  },
+  experimental: {
+    optimizeCss: true,
+    optimizeServerReact: true,
+    scrollRestoration: true,
+    webpackBuildWorker: true,
+    turbotrace: {
+      logLevel: "error",
+      logDetail: true,
+    },
+  },
+  compiler: {
+    removeConsole: process.env.NODE_ENV === "production",
+  },
+  swcMinify: true,
+  compress: true,
+  logging: {
+    fetches: {
+      fullUrl: true,
+    },
+  },
+  poweredByHeader: false,
+  reactStrictMode: true,
+  // Optimize for faster production builds
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: true, // We handle these in development
   },
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: true, // We handle these in development
   },
 };
 

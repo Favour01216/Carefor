@@ -4,6 +4,30 @@
 
 This healthcare platform streamlines patient registration, appointment scheduling, and medical record management. It offers a robust and responsive system for both patients and administrators, incorporating modern technologies like Next.js, Appwrite, and Twilio.
 
+## Live View
+
+### Patient Flow
+
+#### Sign Up
+
+![Sign Up Page](/public/assets/images/Signup.png)
+_Patient registration page with essential information collection_
+
+#### Patient Form
+
+![Patient Form](/public/assets/images/Patient_Form.png)
+_Detailed patient information form for complete medical history_
+
+#### New Appointment
+
+![New Appointment](/public/assets/images/New_Appointment.png)
+_Intuitive appointment booking interface_
+
+### Admin Dashboard
+
+![Admin Dashboard](/public/assets/images/Admin_Dashboard.png)
+_Comprehensive admin dashboard for managing appointments and patient records_
+
 ## Table of Contents
 
 - [Technologies](#technologies)
