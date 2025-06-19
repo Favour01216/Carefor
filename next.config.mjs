@@ -7,13 +7,7 @@ const nextConfig = {
   },
   experimental: {
     optimizeCss: true,
-    optimizeServerReact: true,
     scrollRestoration: true,
-    webpackBuildWorker: true,
-    turbotrace: {
-      logLevel: "error",
-      logDetail: true,
-    },
   },
   compiler: {
     removeConsole: process.env.NODE_ENV === "production",
